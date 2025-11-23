@@ -1,0 +1,98 @@
+/* HEADER WRAPPER */
+.header {
+  width: 100%;
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.45);/* transparent so background image shows */
+  backdrop-filter: blur(5px);      /* soft blur effect */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+  font-family: 'Poppins', 'Helvetica', sans-serif;
+  backdrop-filter: none;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;           /* bold */
+  letter-spacing: 1px;        /* small spacing between letters */
+  color: #87c641;             /* brand green */
+  text-decoration: none;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* subtle shadow for contrast */
+  transition: transform 0.2s;
+}
+
+.logo:hover {
+  transform: scale(1.05); /* small hover effect */
+}
+/* NAV AREA */
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* NAV LINKS */
+.navLinks a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  font-weight: 600;
+  padding: 8px 15px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.navLinks a:hover {
+ background: rgba(98, 178, 6, 0.2); /* greenish translucent */
+  color: #87c641;
+  transform: translateY(-2px); /* slight lift effect */
+}
+
+/* LOGIN BUTTON */
+.btn {
+  padding: 8px 20px;
+  background: #87c641;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #6da12f;
+}
+
+/* LOGGED IN USER TEXT */
+.username {
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navLinks {
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .welcomeText {
+  font-weight: 500;
+  color: #fff;
+  margin-right: 10px;
+  font-size: 0.95rem;
+}
+}
