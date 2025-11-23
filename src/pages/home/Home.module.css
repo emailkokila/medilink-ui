@@ -1,0 +1,37 @@
+.container {
+  width: 100%;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-image: url('../../assets/images/background-image.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;            /* optional if you want to center content */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Login button */
+.loginBtn {
+  padding: 12px 25px;
+  font-size: 1.2rem;
+  background-color: #87c641;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.loginBtn:hover {
+  background-color: #6da12f;
+}
+@media (max-width: 600px) {
+  .container {
+    height:100%; /* adjust header height on small screens */
+  }
+}
