@@ -3,52 +3,112 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
  interface AuthResponse {
     accessToken: string;
     refreshToken: string;
-    // Both expiry times are in the response; we only need one
     refreshTokenExpireTime: string; 
     refreshTokenExpiryTime: string;
     appUserId: number;
 }
-// Define the shape of the user data returned by your API
+interface RefreshTokenResponse {
+    success: boolean;
+    message: string;
+    accessToken?: string;
+    refreshToken?: string;
+    refreshTokenExpiryTime?: string; // Change to string for simplicity with fetch/JSON
+}
 interface UserData {
    appUserId: number;
-    username: string; // Assuming you get this from decoding the token or a separate call
+    username: string; 
     accessToken: string; 
     refreshToken: string;
-    refreshTokenExpiryTime: string; // Store the expiry time as a string
+    refreshTokenExpiryTime: string; 
 }
-// Define the shape of the AuthContext value
+
 interface AuthContextType {
     user: UserData | null;
     loading: boolean;
     login: (username: string, password: string) => Promise<UserData>;
     logout: () => void;
+    refreshToken: () => Promise<string | null>; 
 }
-// Initialize the context with the correct type (or undefined)
+// responsible for managing the user's authentication state
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-//Create an Authentication Context, Add type for the children prop
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    // Initialize user state from storage on load
-    //Add type for user state
-    const [user, setUser] = useState<UserData | null>(JSON.parse(localStorage.getItem('user') || 'null'));
+    // Initialize user state from SESSION storage on load
+    const [user, setUser] = useState<UserData | null>(
+        JSON.parse(sessionStorage.getItem('user') || 'null')
+    );
     const [loading, setLoading] = useState(true);
 
-     // Function to store the user object and token in local storage
-    // [CHANGE 6] Add type for the saveUserData parameter
+     // Function to store the user object and token in SESSION storage
     const saveUserData = (userData: UserData) => {
         setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        // Use sessionStorage.setItem()
+        sessionStorage.setItem('user', JSON.stringify(userData));
     };
+    const logout = () => {
+        sessionStorage.removeItem('user');
+        setUser(null);
+    };
+    // function to call the Refresh Token API
+    const refreshToken = async (): Promise<string | null> => {
+        const REFRESH_URL = 'https://localhost:7179/api/v1/Auth/Refresh'; // Replace with your actual URL
+        const currentUser = JSON.parse(sessionStorage.getItem('user') || 'null');
 
-    // Check auth status on app load
+        if (!currentUser || !currentUser.refreshToken || !currentUser.appUserId) {
+            console.log("Missing user ID or refresh token, logging out.");
+            logout(); // Log out if no refresh token is available
+            return null;
+        }
+
+        try {
+            const response = await fetch(REFRESH_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    UserId: currentUser.appUserId,
+                    RefreshToken: currentUser.refreshToken,
+                }),
+            });
+
+            if (!response.ok) {
+                console.error("Refresh API returned non-OK status.");
+                logout(); // Log out if refresh fails
+                throw new Error('Failed to refresh token');
+            }
+
+            const apiResponse: RefreshTokenResponse  = await response.json(); 
+
+            if (!apiResponse.success || !apiResponse.accessToken || !apiResponse.refreshToken || !apiResponse.refreshTokenExpiryTime) {
+                console.error("Refresh API response indicated failure or missing data.");
+                logout();
+                return null;
+            }
+
+            const updatedUserData: UserData = {
+                ...currentUser,
+                accessToken: apiResponse.accessToken,
+                refreshToken: apiResponse.refreshToken,
+                refreshTokenExpiryTime: apiResponse.refreshTokenExpiryTime, 
+            };
+            saveUserData(updatedUserData);
+            return updatedUserData.accessToken;
+
+        } catch (error) {
+            console.error("Token refresh error caught in fetch:", error);
+            logout();
+            return null;
+        }
+    };
+    /* End updated refresh token */
+
     useEffect(() => {
         setLoading(false);
     }, []);
 
-    // [CHANGE 7] Add types for login parameters and return value
     const login = async (usercode: string, password: string): Promise<UserData> => {
-        const LOGIN_URL = 'https://localhost:7179/api/v1/Auth/login'; 
-
+        const LOGIN_URL = 'https://localhost:7179/api/v1/Auth/login';
         try {
             const response = await fetch(LOGIN_URL, {
                 method: 'POST',
@@ -63,19 +123,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 throw new Error(errorData.message || 'Login failed.');
             }
 
-              // Explicitly type the result from the API call
             const apiResponse: AuthResponse = await response.json(); 
 
-            // Map the AuthResponse to our internal UserData structure
             const userData: UserData = {
                 appUserId: apiResponse.appUserId,
-                // NOTE: 'username' is not in the response provided. 
-                // We typically use the input usercode or decode the JWT token 
-                // to populate this field. For this example, we use the input `usercode`.
                 username: usercode,
                 accessToken: apiResponse.accessToken,
                 refreshToken: apiResponse.refreshToken,
-                // Store the primary expiry time field
                 refreshTokenExpiryTime: apiResponse.refreshTokenExpiryTime, 
             };
             saveUserData(userData);
@@ -85,14 +139,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             throw error;
         }
     };
-
-    const logout = () => {
-        localStorage.removeItem('user');
-        setUser(null);
-    };
     
-    // Ensure the value provided matches the AuthContextType interface
-    const value = { user, loading, login, logout };
+    const value = { user, loading, login, logout, refreshToken };
 
     return (
         <AuthContext.Provider value={value}>
@@ -101,12 +149,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
-// Custom hook to use the AuthContext safely
 export const useAuth = () => {
-    // Add a check to ensure context is defined before returning it
     const context = useContext(AuthContext);
     if (context === undefined) {
         throw new Error('useAuth must be used within an AuthProvider');
     }
-    return context; // TypeScript now knows this is of type AuthContextType
+    return context; 
 };

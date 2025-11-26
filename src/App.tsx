@@ -3,7 +3,7 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Layout from "./components/layout/Layout";
 import LoginSplash from "./pages/login-splash/LoginSplash";
-import Dashboard from "./pages/dashboard/Dashboard";
+import UserDashboard from "./pages/user-dashboard/UserDashboard";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import PatientLogin from "./pages/patient-login/PatientLogin";
 import HomePage from "./pages/home/Home";
@@ -26,7 +26,7 @@ function App() {
                     {/* Protected Routes (Require the user to be logged in) */}
                     {/* Use ProtectedRoute as a wrapper for secured areas */}
                     <Route element={<ProtectedRoute />}>
-                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/user-dashboard" element={<UserDashboard />} />
                       <Route path="/admin-dashboard" element={<AdminDashboard />} />
                      </Route>
                 </Routes>
