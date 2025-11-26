@@ -17,7 +17,6 @@ export default function PatientLogin() {
     setError("");
 
     try {
-      // *** REDLINE CHANGE: Call the context's login function with two arguments ***
       // This function already handles the API call and context update internally.
       const userData = await login(userCode, password);
       
@@ -25,7 +24,7 @@ export default function PatientLogin() {
 
       // localStorage saving is now handled inside AuthContext.tsx's `saveUserData` function.
 
-      navigate("/dashboard");
+      navigate("/user-dashboard");
     } catch (err: any) {
       console.error("Login API call error:", err);
       // Display the specific error message caught from the context's throw Error

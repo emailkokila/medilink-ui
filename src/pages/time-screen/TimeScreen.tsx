@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useApi } from '../../services/apiService';
-import styles from './Dashboard.module.css';
+import { useApi } from '../../services/useApi';
+import styles from './TimeScreen.module.css';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -22,7 +22,7 @@ interface AvailableDay {
 interface AvailableSlotsResponse {
     days: AvailableDay[];
 }
-const Dashboard = () => {
+const TimeScreen = () => {
     const { authenticatedFetch } = useApi();
      const { logout, user } = useAuth();
     const navigate = useNavigate();
@@ -105,4 +105,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default TimeScreen;
