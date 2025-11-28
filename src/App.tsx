@@ -6,6 +6,7 @@ import LoginSplash from "./pages/login-splash/LoginSplash";
 import UserDashboard from "./pages/user-dashboard/UserDashboard";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import PatientLogin from "./pages/patient-login/PatientLogin";
+import UserAppointments from "./pages/user-appointments/UserAppointments";
 import HomePage from "./pages/home/Home";
 import "./global.css";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -28,6 +29,7 @@ function App() {
                     <Route element={<ProtectedRoute />}>
                       <Route path="/user-dashboard" element={<UserDashboard />} />
                       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                      <Route path="/user-appointments" element={<UserAppointments />} />
                      </Route>
                 </Routes>
               </main>
