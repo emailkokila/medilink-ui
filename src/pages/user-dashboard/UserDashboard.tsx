@@ -5,10 +5,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import bannerImg from "../../assets/images/banner3.jpg";
 import { MdAccessTimeFilled, MdHistory, MdClose } from "react-icons/md";
+import { HiXMark  } from "react-icons/hi2";
 const UserDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const goToUpcoming = () => navigate("/user-appointments");
+  const goToCancelled = () => navigate("/user-cancelled-appointments");
   const goToPast = () => navigate("/past-appointments");
   const handleLogout = () => {
     logout();
@@ -18,6 +20,7 @@ const UserDashboard = () => {
     pastAppointmentCount: number;
     futureAppointmentCount: number;
     upcomingAppointmentDate?: string;
+    cancelledAppointmentCount: number;
   } | null>(null);
   const { authenticatedFetch } = useApi(); // Get the fetch utility
   
@@ -81,7 +84,7 @@ const UserDashboard = () => {
       <div className={styles.mainContent}>
         {/* TOP HEADER */}
         <header className={styles.header}>
-          <h1 className={styles.medilink}>Medilink</h1>
+          <h1 className={styles.logo}>Medilink</h1>
           <button className={styles.logout} onClick={handleLogout}>Logout</button>
         </header>
 
@@ -119,15 +122,22 @@ const UserDashboard = () => {
                 <span className={styles.statNumber}>{dashboardData?.pastAppointmentCount ?? 0}</span>
             </div>
           </div>
-
-          <div className={styles.statBox} onClick={goToUpcoming}>
+          <div className={styles.statBox} onClick={goToCancelled}>
             <div className={`${styles.statHeader} ${styles.redBg}`}>
-              Upcoming Appointments
+              Cancelled Appointments
             </div><div className={styles.statRow}>
-              <MdAccessTimeFilled className={styles.statsIconRed} />
-              <span className={styles.statNumber}>{dashboardData?.futureAppointmentCount ?? 0}</span>
+              <HiXMark className={styles.statsIconRed} />
+              <span className={styles.statNumber}>{dashboardData?.cancelledAppointmentCount ?? 0}</span>
             </div>
           </div>
+          <div className={styles.statBox} onClick={goToUpcoming}>
+            <div className={`${styles.statHeader} ${styles.OrangeBg}`}>
+              Upcoming Appointments
+            </div><div className={styles.statRow}>
+              <MdAccessTimeFilled className={styles.statsIconOrange} />
+              <span className={styles.statNumber}>{dashboardData?.futureAppointmentCount ?? 0}</span>
+            </div>
+          </div>  
         </section>
       </div>
     </div>

@@ -207,7 +207,13 @@
 .statsIconRed {
   font-size: 30px;
   margin: 15px 0 12px 0;
-  color: #EF5A65; /* choose any or customize per box */
+  color: #EF5A65;
+}
+
+.statsIconOrange {
+  font-size: 30px;
+  margin: 15px 0 12px 0;
+  color: #ccc650;
 }
 .statNumber {
   font-size: 32px;
@@ -216,6 +222,7 @@
 .greenBg { background: #87C641; }
 .blueBg { background: #25557c; }
 .redBg { background: #ef5a65; }
+.OrangeBg { background: #ccc650; }
 
 .statBox h2 {
   margin: 20px 0;
@@ -227,8 +234,12 @@
   vertical-align: middle;
   color: white;
 }
-.upcoming {
+.next {
   background: #87C641;
+}
+
+.upcoming{
+  background: #ccc650;
 }
 
 .past {
@@ -237,4 +248,17 @@
 
 .cancelled {
   background: #EF5A65;
+}
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;           /* bold */
+  letter-spacing: 1px;        /* small spacing between letters */
+  color: #150c63;             /* brand green */
+  text-decoration: none;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* subtle shadow for contrast */
+  transition: transform 0.2s;
+}
+
+.logo:hover {
+  transform: scale(1.05); /* small hover effect */
 }
