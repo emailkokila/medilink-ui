@@ -3,6 +3,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../services/useApi";
 import styles from "./UserAppointments.module.css";
+import { formatDateTime } from '../../utils/formatters';
+import { ConfirmationModal } from '../../pages/confirmation-modal/ConfirmationModal';
 interface PaginatedAppointments {
   data: Appointment[];
   totalCount: number;
@@ -14,6 +16,7 @@ interface Appointment {
     appointmentTime: string;
     createdAt: string | null;
     status: number;
+    cancelledDate: string;
 }
 const UserAppointments = ()=> {
     const { user, logout } = useAuth();
@@ -28,6 +31,8 @@ const UserAppointments = ()=> {
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
     // Function to handle moving to the next page
     const handleNextPage = () => {
         if (currentPage < totalPages) {
@@ -43,14 +48,54 @@ const UserAppointments = ()=> {
     };
 
      const handleReschedule = (appointmentId: number) => {
-        console.log(`Reschedule appointment ID: ${appointmentId}`);
-        alert(`Reschedule appointment ${appointmentId}`);
+        navigate('/display-timescreen', { state: { currentAppointmentId: appointmentId } });
     };
 
-    const handleCancel = (appointmentId: number) => {
-        console.log(`Cancel appointment ID: ${appointmentId}`);
-        alert(`Cancel appointment ${appointmentId}`);
+    const handleCancel = (appointmentId: number): void => {
+       setSelectedAppointmentId(appointmentId);
+       setIsModalOpen(true);
     };
+
+    const confirmCancellation = async () => {
+        if (selectedAppointmentId !== null) {
+            await cancelAppointment(selectedAppointmentId);
+            setIsModalOpen(false); // Close the modal
+            setSelectedAppointmentId(null); // Reset the ID
+        }
+    };
+
+    const closeCancellationModal = () => {
+        setIsModalOpen(false);
+        setSelectedAppointmentId(null);
+    };
+
+    const cancelAppointment = async(appointmentId: number): Promise<void>=>{
+        try
+        {
+            const response = await authenticatedFetch(
+                `api/v2/appointment/cancel-appointment`, 
+                { 
+                    method: "POST",
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ existingAppointmentId: appointmentId })
+                }
+            );
+
+            if (!response.ok){
+                const errorData = await response.text();
+                throw new Error(`API error: ${response.status} - ${errorData}`);
+            }
+
+            const cancelledAppointment : Appointment = await response.json();
+            console.log(`Successfully cancelled appointment: ${cancelledAppointment.appointmentId}`);
+            navigate('/cancelled-appointments');
+        }
+        catch(error){
+            console.error("Failed to cancel appointment:", (error as Error).message);
+        }
+    }
 
      const formatStatus = (status: number) => {
         switch (status) {
@@ -101,26 +146,6 @@ const UserAppointments = ()=> {
 
     // pagination calculation    
     const totalPages = Math.ceil(totalCount / pageSize);
-    const formatDateTime  = (dateString: string, timeString: string) => {
-        const [hours, minutes, seconds] = timeString.split(":").map(Number);
-        const date = new Date(dateString);
-        date.setHours(hours, minutes, seconds);
-
-        const formattedDate = date.toLocaleDateString("en-US", {
-            weekday: "short", // Wed
-            month: "short",   // Nov
-            day: "numeric",   // 27
-            year: "numeric"   // 2025
-        });
-
-        const formattedTime = date.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false, // 24-hour format
-        });
-
-        return `${formattedDate} at ${formattedTime}`;
-    };
     if (isLoading) {
         return <div className={styles.layout}>Loading appointments...</div>;
     }
@@ -156,14 +181,14 @@ const UserAppointments = ()=> {
           </button>
         </div>
         {/* SUBTITLE */}
-        <div style={{ marginTop: "20px" }}>
+        <div className={styles.paginationText}>
           <h4>List of all your current or future appointments</h4>
         </div>
          {/* TABLE */}
         <div className={styles.tableContainer} style={{ marginTop: "20px" }}>
             {/* Entries selector */}
           <div style={{ marginBottom: "10px", display: "flex", justifyContent: "space-between" }}>
-            <div>
+            <div className={styles.paginationText}>
               Show{" "}
               <select
                 value={pageSize}
@@ -261,6 +286,12 @@ const UserAppointments = ()=> {
           </div>
         </div>
       </div>
+      {isModalOpen && (
+                <ConfirmationModal 
+                    onConfirm={confirmCancellation} 
+                    onCancel={closeCancellationModal} 
+                />
+       )}
     </div>
     );
 }

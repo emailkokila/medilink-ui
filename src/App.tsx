@@ -7,7 +7,9 @@ import UserDashboard from "./pages/user-dashboard/UserDashboard";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import PatientLogin from "./pages/patient-login/PatientLogin";
 import UserAppointments from "./pages/user-appointments/UserAppointments";
+import CancelledAppointments from "./pages/cancelled-appointments/CancelledAppointments";
 import HomePage from "./pages/home/Home";
+import DisplayTimeScreen from "./pages/display-timescreen/DisplayTimeScreen";
 import "./global.css";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -30,6 +32,8 @@ function App() {
                       <Route path="/user-dashboard" element={<UserDashboard />} />
                       <Route path="/admin-dashboard" element={<AdminDashboard />} />
                       <Route path="/user-appointments" element={<UserAppointments />} />
+                      <Route path="/display-timescreen" element={<DisplayTimeScreen />} />
+                      <Route path="/cancelled-appointments" element={<CancelledAppointments />} />
                      </Route>
                 </Routes>
               </main>

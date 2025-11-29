@@ -1,0 +1,78 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Make sure it's above other content */
+}
+
+/* Modal Content Box */
+.modalContent {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.modalContent h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.modalActions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Styling for the button in the table */
+.btnCancel {
+    background-color: #dc3545; /* Red color */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btnCancel:hover {
+    background-color: #c82333;
+}
+.btnPrimary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btnSecondary {
+    background-color: #e9ecef;
+    color: #333;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btnPrimary:hover {
+    background-color: #0056b3;
+}
+
+.btnSecondary {
+    background-color: #e9ecef; /* Light gray for secondary action */
+    color: #333;
+}
+
+.btnSecondary:hover {
+    background-color: #d6d6d6;
+}
