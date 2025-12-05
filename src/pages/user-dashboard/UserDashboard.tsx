@@ -48,7 +48,7 @@ const UserDashboard = () => {
               method: 'GET',
           });
           const data = await response.json();
-          //console.log(data);
+          console.log(data);
           setDashboardData(data);
         } catch (error) {
             console.error("Failed to fetch dashboard data:", (error as Error).message);
@@ -74,9 +74,9 @@ const UserDashboard = () => {
         </div>
 
         <nav className={styles.menu}>
-          <button className={styles.menuBtn}>Book an Appointment</button>
-          <button className={styles.menuBtn}>Home</button>
-          <button className={styles.menuBtn}>My Appointments</button>
+          <button className={styles.menuBtn} onClick={()=>{navigate('/display-timescreen')}}>Book an Appointment</button>
+          <button className={styles.menuBtn} onClick={()=>{navigate('/user-dashboard')}}>Home</button>
+          <button className={styles.menuBtn} onClick={()=>{navigate('/user-appointments')}}>My Appointments</button>
         </nav>
       </aside>
         
@@ -94,7 +94,7 @@ const UserDashboard = () => {
         }}>
             <div className={styles.bannerRow}>
                     <span>Hi {user?.username}</span>
-                    <button className={styles.primaryBtn}>Book an Appointment</button>
+                    <button className={styles.primaryBtn} onClick={()=>{navigate('/display-timescreen')}}>Book an Appointment</button>
             </div>
             <div className={styles.bannerRow}>
                 <span>Here's your profile summary for today.</span>

@@ -157,9 +157,9 @@ const UserAppointments = ()=> {
           <h3>{user?.username || "User"}</h3>
         </div>
         <nav className={styles.menu}>
-          <button className={styles.menuBtn}>Book an Appointment</button>
-          <button className={styles.menuBtn}>Home</button>
-          <button className={styles.menuBtn}>My Appointments</button>
+          <button className={styles.menuBtn} onClick={()=>{navigate('/display-timescreen')}}>Book an Appointment</button>
+          <button className={styles.menuBtn} onClick={()=>{navigate('/user-dashboard')}}>Home</button>
+          <button className={styles.menuBtn} onClick={()=>{navigate('/user-appointments')}}>My Appointments</button>
         </nav>
       </aside>
 
@@ -176,7 +176,7 @@ const UserAppointments = ()=> {
           <button className={styles.btnPastAppt}>
             View Past Appointments
           </button>
-          <button className={styles.btnBookAppt}>
+          <button className={styles.btnBookAppt} onClick={()=>{navigate('/display-timescreen')}}>
             Book an Appointment
           </button>
         </div>

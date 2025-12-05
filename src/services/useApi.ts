@@ -47,9 +47,8 @@ export const useApi = () => {
             ...options,
             headers: getHeaders(token),
         };
-
         let response = await fetch(finalUrl, fetchOptions);
-
+        
         if (response.status === 401) { 
             try{
                 const newAccessToken = await refreshToken();
