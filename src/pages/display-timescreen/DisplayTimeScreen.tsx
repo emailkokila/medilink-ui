@@ -24,7 +24,17 @@ interface AvailableSlotsResponse {
   days: AvailableDay[];
 }
 
-const DisplayTimeScreen = () => {
+interface SuccessDialogProps {
+    message: string;
+    isOpen: boolean;
+    onClose: () => void; // A function that takes no arguments and returns nothing
+}
+interface ErrorDialogProps {
+  message: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+  const DisplayTimeScreen = () => {
   const { authenticatedFetch } = useApi();
   const { logout, user } = useAuth();
   const navigate = useNavigate();
@@ -37,7 +47,11 @@ const DisplayTimeScreen = () => {
   const [startIndex, setStartIndex] = useState(0);
   const [lastLoadedDate, setLastLoadedDate] = useState<string>(new Date().toISOString());
   const visibleDaysCount = 5;
-
+  const [newDates, setNewDates] = useState<string[]>([]);
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const toggleGroup = (date: string, group: string) => {
     const key = `${date}-${group}`;
     setExpandedGroup(expandedGroup === key ? null : key);
@@ -113,15 +127,30 @@ const DisplayTimeScreen = () => {
 };
   const isNextDisabled = !availableSlot || 
   new Date(availableSlot.days[Math.min(startIndex + visibleDaysCount - 1, availableSlot.days.length - 1)].date) >= maxDate;
-  const [newDates, setNewDates] = useState<string[]>([]);
+  
+  const appointmentId = location.state?.currentAppointmentId;
   const loadSlots = async (date?: string) => {
     setLoading(true);
     setError(null);
     try {
-      const appointmentId = location.state?.currentAppointmentId;
       const queryDate = date ? formatDateForApi(new Date(date)) : formatDateForApi(new Date());
-      const response = await authenticatedFetch(`api/v1/appointment/available-slots?Date=${queryDate}`, { method: "GET" });
-      const data: AvailableSlotsResponse = await response.json();
+      const response = await authenticatedFetch(
+        `api/v1/appointment/available-slots?Date=${queryDate}`,
+         { method: "GET" }
+      );
+      const contentType = response.headers.get("content-type") || "";
+      const responseText = await response.text();
+      if (!response.ok) {
+         let errorText = "";
+      try {
+        const json = JSON.parse(responseText);
+        errorText = json.message || JSON.stringify(json);
+      } catch {
+        errorText = responseText.substring(0, 200);
+      }
+        throw new Error(`API error ${response.status}: ${errorText}`);
+      }
+      const data: AvailableSlotsResponse = JSON.parse(responseText);
       if (availableSlot) {
         // Append new days if already loaded
         setAvailableSlots(prev => {
@@ -134,7 +163,7 @@ const DisplayTimeScreen = () => {
           return { days: [...prev.days, ...newDays]};
         });
       } else {
-      setAvailableSlots(data);
+        setAvailableSlots(data);
       }
       // Update lastLoadedDate to last date returned
       if (data.days.length > 0) {
@@ -160,6 +189,159 @@ useEffect(() => {
 
   if (loading && !availableSlot) return <div>Loading slots...</div>;
   if (error) return <div>Error: {error}</div>;
+  
+  const SuccessDialog: React.FC<SuccessDialogProps> = ({ message, isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+      <div className={styles.overlay}>
+        <div className={styles.dialogBox}>
+          <div className={styles.iconPlaceholder}>✅</div> {/* Success Icon */}
+          <p className={styles.message}>{message}</p>
+          <button onClick={onClose} className={styles.closeButton}>
+            OK
+          </button>
+        </div>
+      </div>
+    );
+  };
+  const ErrorDialog: React.FC<ErrorDialogProps> = ({ message, isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+        <div className={styles.overlay}>
+          <div className={styles.dialogBox}>
+            <div className={styles.iconPlaceholder}>❌</div> {/* Error Icon */}
+            <p className={styles.message}>{message}</p>
+            <button onClick={onClose} className={styles.closeButton}>
+              OK
+            </button>
+          </div>
+        </div>
+      );
+  };
+  const showErrorDialog = (message: string) => {
+    setErrorMessage(message);
+    setErrorDialogOpen(true);    
+  };
+
+  const closeErrorDialog = () => {
+    setErrorDialogOpen(false);
+    setErrorMessage("");
+  };
+  const reScheduleAppointment = async() =>{
+      try{
+          const response = await authenticatedFetch(`api/v2/appointment/rebook-appointment`, 
+            { 
+              method: "POST",
+              headers: {
+              'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+              existingAppointmentId: appointmentId,
+              date: selectedSlot?.date,
+              time: selectedSlot?.time
+              })
+            }      
+          );
+          // Check if the response is OK (status in the range 200-299)
+        if (response.ok) {
+            // Handle successful scenario (HTTP 200 OK implied)
+            setSuccessMessage("Appointment successfully updated.");
+            setIsSuccessOpen(true);            
+        } else {
+            // Handle error scenarios where status is outside 200-299
+            const statusCode = response.status;
+            let errorMessage = "An unexpected error occurred.";
+
+            switch (statusCode) {
+                case 400:
+                    errorMessage = "Invalid date or time provided. Please check your selection.";
+                    break;
+                case 404:
+                    errorMessage = "The original appointment could not be found.";
+                    break;
+                case 409:
+                    errorMessage = "The requested time slot is already booked. Please choose another time.";
+                    break;
+                default:
+                     const errorData = await response.json(); 
+                     errorMessage = errorData.message || errorMessage;
+                     break;
+            }
+             showErrorDialog(errorMessage);
+          }
+      }
+      catch (networkerror){
+
+      }
+  }
+
+  const ScheduleAppointment = async() =>{
+      try{
+          const response = await authenticatedFetch(`api/v1/appointment/book-slot`, 
+            { 
+              method: "POST",
+              headers: {
+              'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+              date: selectedSlot?.date,
+              time: selectedSlot?.time
+              })
+            }      
+          );
+          // Check if the response is OK (status in the range 200-299)
+        if (response.ok) {
+            // Handle successful scenario (HTTP 200 OK implied)
+            setSuccessMessage("Appointment successfully created.");
+            setIsSuccessOpen(true);            
+        } else {
+            // Handle error scenarios where status is outside 200-299
+            const statusCode = response.status;
+            let errorMessage = "An unexpected error occurred.";
+
+            switch (statusCode) {
+               case 401:
+                    errorMessage = "Incorrect input format";
+                    break;
+                case 400:
+                    errorMessage = "Invalid date or time provided. Please check your selection.";
+                    break;
+                case 404:
+                    errorMessage = "The original appointment could not be found.";
+                    break;
+                case 409:
+                    errorMessage = "The requested time slot is already booked. Please choose another time.";
+                    break;
+                default:
+                     const errorData = await response.json(); 
+                     errorMessage = errorData.message || errorMessage;
+                    break;
+            }
+            showErrorDialog(errorMessage);
+          }
+      }
+      catch (error:any){
+         showErrorDialog(error.message || "Network error occurred.");
+      }
+  }
+
+  const Schedule = async () => {
+      console.log("ScheduleAppointment called", selectedSlot);
+      console.log("Schedule branch chosen:", appointmentId != null && appointmentId > 0 ? "reschedule" : "new schedule");
+    if (appointmentId != null &&appointmentId > 0)
+    {
+      await reScheduleAppointment();
+    }
+    else
+    {
+      await ScheduleAppointment();
+    }
+  }
+
+  const goBack = ()=>{
+    setSelectedSlot(null);
+    navigate(-1);
+  }
 
   return (
   <div className={styles.layout}>
@@ -170,8 +352,8 @@ useEffect(() => {
       </div>
       <nav className={styles.menu}>
         <button className={styles.menuBtn}>Book an Appointment</button>
-        <button className={styles.menuBtn}>Home</button>
-        <button className={styles.menuBtn}>My Appointments</button>
+        <button className={styles.menuBtn} onClick={()=>{navigate('/user-dashboard')}}>Home</button>
+        <button className={styles.menuBtn} onClick={()=>{navigate('/user-appointments')}}>My Appointments</button>
       </nav>
     </aside>
 
@@ -239,8 +421,13 @@ useEffect(() => {
                                     selectedSlot?.time === slot.time && selectedSlot?.date === day.date
                                       ? styles.selectedTime
                                       : ''
-                                  }`}
-                                  onClick={() => chooseSlot(day.date, slot.time)}
+                                  } ${!slot.isAvailable ? styles.disabledTime : ''}`}
+                                  onClick={() => {
+                                    if (slot.isAvailable)
+                                    {
+                                      chooseSlot(day.date, slot.time)
+                                    }
+                                  }}
                                 >
                                   {slot.time}
                                 </div>
@@ -271,13 +458,31 @@ useEffect(() => {
       {/* FOOTER */}
       <div className={styles.footer}>
         <button className={styles.refreshBtn} onClick={handleRefresh}>Refresh</button>
-        <button className={styles.backBtn} onClick={() => setSelectedSlot(null)}>Back</button>
+        <button className={styles.backBtn} onClick={() => goBack()}>Back</button>
         {selectedSlot && (
           <div className={styles.selectedTimeText}>
             Your selected time is on: {formatDateTime(selectedSlot.date, selectedSlot.time)}
-            <button className={styles.bookBtn} onClick={() => setSelectedSlot(null)}>Book an appointment</button>
+            <button className={styles.bookBtn} onClick={()=>Schedule()}>Book an appointment</button>
+            
           </div>
         )}
+        <SuccessDialog 
+                message={successMessage} 
+                isOpen={isSuccessOpen} 
+                onClose={() => {
+                  setIsSuccessOpen(false);
+                  navigate('/user-appointments');
+                }} 
+         />
+         <ErrorDialog
+            message={errorMessage}
+            isOpen={errorDialogOpen}
+            onClose={() => {
+              setErrorDialogOpen(false);
+              setErrorMessage('');
+              navigate('/user-appointments');
+            }}
+          />
       </div>
     </div>
   </div>
