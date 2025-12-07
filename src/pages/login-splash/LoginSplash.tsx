@@ -36,7 +36,7 @@ export default function LoginSplash() {
             >
               Clinic
             </button>
-            <p>Login to manage system and clinics</p>
+            <p>Login to complete appointments</p>
           </div>
         </div>
       </main>
