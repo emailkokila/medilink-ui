@@ -195,7 +195,7 @@ useEffect(() => {
     return (
       <div className={styles.overlay}>
         <div className={styles.dialogBox}>
-          <div className={styles.iconPlaceholder}>✅</div> {/* Success Icon */}
+          <div className={styles.iconPlaceholder}>✅</div>
           <p className={styles.message}>{message}</p>
           <button onClick={onClose} className={styles.closeButton}>
             OK
@@ -209,7 +209,7 @@ useEffect(() => {
     return (
         <div className={styles.overlay}>
           <div className={styles.dialogBox}>
-            <div className={styles.iconPlaceholder}>❌</div> {/* Error Icon */}
+            <div className={styles.iconPlaceholder}>❌</div>
             <p className={styles.message}>{message}</p>
             <button onClick={onClose} className={styles.closeButton}>
               OK

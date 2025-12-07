@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Layout from "./components/layout/Layout";
 import LoginSplash from "./pages/login-splash/LoginSplash";
@@ -8,6 +7,7 @@ import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import PatientLogin from "./pages/patient-login/PatientLogin";
 import UserAppointments from "./pages/user-appointments/UserAppointments";
 import CancelledAppointments from "./pages/cancelled-appointments/CancelledAppointments";
+import PastAppointments from "./pages/past-appointments/PastAppointments";
 import HomePage from "./pages/home/Home";
 import DisplayTimeScreen from "./pages/display-timescreen/DisplayTimeScreen";
 import "./global.css";
@@ -34,6 +34,7 @@ function App() {
                       <Route path="/user-appointments" element={<UserAppointments />} />
                       <Route path="/display-timescreen" element={<DisplayTimeScreen />} />
                       <Route path="/cancelled-appointments" element={<CancelledAppointments />} />
+                      <Route path="/past-appointments" element={<PastAppointments />} />
                      </Route>
                 </Routes>
               </main>

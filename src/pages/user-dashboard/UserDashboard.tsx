@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import bannerImg from "../../assets/images/banner3.jpg";
 import { MdAccessTimeFilled, MdHistory, MdClose } from "react-icons/md";
 import { HiXMark  } from "react-icons/hi2";
+import { formatDateTimeFromIso } from "../../utils/formatters";
 const UserDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const goToUpcoming = () => navigate("/user-appointments");
-  const goToCancelled = () => navigate("/user-cancelled-appointments");
+  const goToCancelled = () => navigate("/cancelled-appointments");
   const goToPast = () => navigate("/past-appointments");
   const handleLogout = () => {
     logout();
@@ -19,29 +20,10 @@ const UserDashboard = () => {
   const [dashboardData, setDashboardData] = useState<{
     pastAppointmentCount: number;
     futureAppointmentCount: number;
-    upcomingAppointmentDate?: string;
+    upcomingAppointmentDate: string;
     cancelledAppointmentCount: number;
   } | null>(null);
   const { authenticatedFetch } = useApi(); // Get the fetch utility
-  
-  const formatAppointmentDate = (dateString: string): { formattedDate: string; formattedTime: string } => {
-  const date = new Date(dateString);
-  const formattedDate = date.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  });
-
-  const formattedTime = date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  });
-
-   return { formattedDate, formattedTime };
-  };
-
   const fetchDashboardData = async () => {
       try {
             const response = await authenticatedFetch('api/v1/appointment/summary', {
@@ -60,11 +42,6 @@ const UserDashboard = () => {
         fetchDashboardData();
   }, []);
 
- 
-  const next = dashboardData?.upcomingAppointmentDate
-    ? formatAppointmentDate(dashboardData.upcomingAppointmentDate)
-    : null;
-    
   return (
     <div className={styles.layout}>
       {/* LEFT SIDEBAR */}
@@ -108,8 +85,8 @@ const UserDashboard = () => {
             <div className={`${styles.statHeader} ${styles.greenBg}`}>
               Next Appointment
             </div>
-            <div className={styles.statRow}>              
-                <span>{next ? `${next.formattedDate} ${next.formattedTime}` : "No upcoming appointment"}</span>
+            <div className={styles.statRow}>
+                {formatDateTimeFromIso(dashboardData?.upcomingAppointmentDate ?? "")}
             </div>
           </div>
 

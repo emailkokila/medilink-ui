@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../services/useApi";
-import styles from "./UserAppointments.module.css";
-import { formatDateTime } from '../../utils/formatters';
-import { ConfirmationModal } from '../../pages/confirmation-modal/ConfirmationModal';
-
+import styles from "./PastAppointments.module.css";
+import { formatDateTime, formatDateTimeFromIso, formatStatus } from '../../utils/formatters';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 interface Appointment {
     appointmentId: number;
     patientId: number;
@@ -13,9 +13,9 @@ interface Appointment {
     appointmentTime: string;
     createdAt: string | null;
     status: number;
-    cancelledDate: string;
+    completedDate: string;
 }
-const UserAppointments = ()=> {
+const PastAppointments = ()=> {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const handleLogout = () => {
@@ -28,8 +28,6 @@ const UserAppointments = ()=> {
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
     // Function to handle moving to the next page
     const handleNextPage = () => {
         if (currentPage < totalPages) {
@@ -43,76 +41,10 @@ const UserAppointments = ()=> {
             setCurrentPage(currentPage - 1);
         }
     };
-
-     const handleReschedule = (appointmentId: number) => {
-        navigate('/display-timescreen', { state: { currentAppointmentId: appointmentId } });
-    };
-
-    const handleCancel = (appointmentId: number): void => {
-       setSelectedAppointmentId(appointmentId);
-       setIsModalOpen(true);
-    };
-
-    const confirmCancellation = async () => {
-        if (selectedAppointmentId !== null) {
-            await cancelAppointment(selectedAppointmentId);
-            setIsModalOpen(false); // Close the modal
-            setSelectedAppointmentId(null); // Reset the ID
-        }
-    };
-
-    const closeCancellationModal = () => {
-        setIsModalOpen(false);
-        setSelectedAppointmentId(null);
-    };
-
-    const cancelAppointment = async(appointmentId: number): Promise<void>=>{
-        try
-        {
-            const response = await authenticatedFetch(
-                `api/v2/appointment/cancel-appointment`, 
-                { 
-                    method: "POST",
-                    headers: {
-                    'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ existingAppointmentId: appointmentId })
-                }
-            );
-
-            if (!response.ok){
-                const errorData = await response.text();
-                throw new Error(`API error: ${response.status} - ${errorData}`);
-            }
-
-            const cancelledAppointment : Appointment = await response.json();
-            console.log(`Successfully cancelled appointment: ${cancelledAppointment.appointmentId}`);
-            navigate('/cancelled-appointments');
-        }
-        catch(error){
-            console.error("Failed to cancel appointment:", (error as Error).message);
-        }
-    }
-
-     const formatStatus = (status: number) => {
-        switch (status) {
-            case 0:
-                return 'Inactive';
-            case 1:
-                return 'Active';
-            case 2:
-                return 'Completed';
-            case 3:
-                return 'Cancelled';
-            default:
-                return 'Unknown';
-        }
-    };
-
     const fetchAppointments = async (page = currentPage, size = pageSize) => {
         setIsLoading(true);
         try{
-             const response = await authenticatedFetch(`api/v1/appointment/by-patient?PageNumber=${page}&PageSize=${size}&Status=1`, {
+             const response = await authenticatedFetch(`api/v1/appointment/by-patient?PageNumber=${page}&PageSize=${size}&Status=3`, {
               method: 'GET',
           });
          if (!response.ok) {
@@ -169,17 +101,16 @@ const UserAppointments = ()=> {
         </header>
         {/* SECTION HEADER */}
         <div>
-          <h2 className={styles.headerText}>My Appointments</h2>
-          <button className={styles.btnPastAppt} onClick={()=>{navigate('/past-appointments')}}>
-            View Past Appointments
-          </button>
-          <button className={styles.btnBookAppt} onClick={()=>{navigate('/display-timescreen')}}>
-            Book an Appointment
+          <h2 className={styles.headerText}>Past Appointments</h2>
+          <button className={styles.btnPastAppt} onClick={()=>{navigate('/user-appointments')}}>
+            <FontAwesomeIcon icon={faArrowLeft} /> 
+            {' '}
+            Go Back to Current Appointments
           </button>
         </div>
         {/* SUBTITLE */}
         <div className={styles.paginationText}>
-          <h4>List of all your current or future appointments</h4>
+          <h4>List of all your cancelled appointments</h4>
         </div>
          {/* TABLE */}
         <div className={styles.tableContainer} style={{ marginTop: "20px" }}>
@@ -208,48 +139,33 @@ const UserAppointments = ()=> {
                 <thead>
                 <tr className={styles.tableHeaderText}>
                     <th style={{ cursor: "pointer" }}>
+                       Name
+                    </th>
+                    <th style={{ cursor: "pointer" }}>
+                       Status
+                    </th>
+                    <th style={{ cursor: "pointer" }}>
                         Date / Time
                     </th>
-                    {/*<th style={{ cursor: "pointer" }}>
-                        Patient
-                    </th>*/}
                     <th style={{ cursor: "pointer" }}>
-                        Status
-                    </th>
-                    <th style={{ cursor: "pointer" }}>
-                        Actions
+                        Completed Date
                     </th>
                 </tr>
                 </thead>
                 <tbody>
                 {appointments?.length === 0 ? (
                     <tr>
-                        <td colSpan={3} className="text-center">
+                        <td colSpan={4} className="text-center">
                             No appointments found
                         </td>
                     </tr>
                 ) : (
                     appointments?.map((appt) => (
                     <tr key={appt.appointmentId} className={styles.tableDataRow}>
+                        <td className={styles.tableText}>{user?.username}</td>
+                        <td className={styles.tableText}>{formatStatus(appt.status)}</td>
                         <td className={styles.tableText}>{formatDateTime(appt.appointmentDate, appt.appointmentTime)}</td>
-                       {/* <td className={styles.tableText}>{`Patient ${appt.patientId}`}</td>*/} {/* Replace with real patient name when available */}
-                        <td className={styles.tableText}>{formatStatus(appt.status)}</td> {/* Replace with real status if backend provides it */}
-                        <td className={styles.tableText}>
-                          <div className={styles.actionButtonsContainer}>
-                                <button 
-                                    onClick={() => handleReschedule(appt.appointmentId)}
-                                    className={styles.btnActionReschedule}
-                                >
-                                    Reschedule
-                                </button>
-                                <button 
-                                    onClick={() => handleCancel(appt.appointmentId)}
-                                    className={styles.btnActionCancel}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </td>
+                        <td className={styles.tableText}>{formatDateTimeFromIso(appt.completedDate)}</td>
                     </tr>
                     ))
                 )}
@@ -283,13 +199,7 @@ const UserAppointments = ()=> {
           </div>
         </div>
       </div>
-      {isModalOpen && (
-                <ConfirmationModal 
-                    onConfirm={confirmCancellation} 
-                    onCancel={closeCancellationModal} 
-                />
-       )}
     </div>
     );
 }
-export default UserAppointments;
+export default PastAppointments;
