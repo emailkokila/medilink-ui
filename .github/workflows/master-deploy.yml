@@ -24,11 +24,6 @@ jobs:
         # Configuration for the SWA Builder (Oryx)
         app_location: "/" 
         output_location: "build" 
-        api_location: "" 
-        
-        # Forces the builder to use the correct version and ignore peer-dep issues
-        nodejs_version: "18.x" 
-        app_build_command: "npm install --legacy-peer-deps && npm run build"
-        
+        api_location: ""         
         # We don't skip the build, we custom configure it above
         skip_api_build: true
