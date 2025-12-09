@@ -15,7 +15,16 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20.x' # Use your project's required Node version
+        node-version: '18.x' # Use your project's required Node version
+        
+    # Cache Node modules (optional but speeds up builds)
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
     - name: Install dependencies
       run: npm install --legacy-peer-deps
@@ -23,3 +32,5 @@ jobs:
     - name: Build React App (Verification Only)
       # This step verifies the app builds successfully without deploying
       run: npm run build
+      env:
+          REACT_APP_API_URL: https://your-api.azurewebsites.net

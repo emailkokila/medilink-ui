@@ -21,14 +21,13 @@ jobs:
         action: "upload"
         azure_static_web_apps_api_token: ${{ secrets.AZURE_REACT_DEPLOY_TOKEN }}
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        
         # Configuration for the SWA Builder (Oryx)
         app_location: "/" 
         output_location: "build" 
         api_location: "" 
         
         # Forces the builder to use the correct version and ignore peer-dep issues
-        nodejs_version: "22.x" 
+        nodejs_version: "18.x" 
         app_build_command: "npm install --legacy-peer-deps && npm run build"
         
         # We don't skip the build, we custom configure it above
