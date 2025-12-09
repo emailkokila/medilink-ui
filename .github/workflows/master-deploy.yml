@@ -1,0 +1,38 @@
+name: Master Merge & Deploy to Azure
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build React App for Production
+      run: npm run build
+
+    - name: Deploy to Azure Static Web App
+      # This action pushes the build artifacts to Azure
+      uses: azure/static-web-apps-deploy@v1
+      with:
+        # This token MUST be configured as a GitHub Secret in your repo settings
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_REACT_DEPLOY_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub API interactions
+        app_location: "/" 
+        output_location: "build" # Common build output folder name (check your project config)
+        api_location: "" # Leave blank if your API is separate
+        skip_app_build: true
+        skip_api_build: true
