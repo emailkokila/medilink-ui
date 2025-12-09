@@ -32,7 +32,7 @@ export default function LoginSplash() {
             <span className="fa fa-user-md fa-5x"></span>
             <button
               className={styles.roleBtn}
-              onClick={() => navigate("/admin-dashboard")}
+              onClick={() => navigate("/clinician-login")}
             >
               Clinic
             </button>

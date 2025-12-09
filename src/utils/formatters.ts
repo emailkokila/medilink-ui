@@ -21,6 +21,10 @@
 
   export const formatDateTimeFromIso = (isoString: string): string => {
     // The Date object handles parsing the full ISO string automatically
+    if (isoString == "")
+    {
+        return "No appointments";
+    }
     const date = new Date(isoString);
 
     const formattedDate = date.toLocaleDateString("en-US", {

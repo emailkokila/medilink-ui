@@ -3,17 +3,28 @@ import styles from "./ConfirmationModal.module.css";
 interface ModalProps {
     onConfirm: () => void;
     onCancel: () => void;
+    title?: string;
+    message?: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
 }
 
-export const ConfirmationModal: React.FC<ModalProps> = ({ onConfirm, onCancel }) => {
+export const ConfirmationModal: React.FC<ModalProps> = ({
+    onConfirm,
+    onCancel,
+    title = "Are you sure?",
+    message = "Do you really want to cancel this appointment?",
+    confirmLabel = "Yes, Cancel",
+    cancelLabel = "No"
+}) => {
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
-                <h3>Are you sure?</h3>
-                <p>Do you really want to cancel this appointment?</p>
+                <h3>{title}</h3>
+                <p>{message}</p>
                 <div className={styles.modalActions}>
-                    <button className={styles.btnSecondary} onClick={onCancel}>No</button>
-                    <button className={styles.btnPrimary} onClick={onConfirm}>Yes, Cancel</button>
+                    <button className={styles.btnSecondary} onClick={onCancel}>{cancelLabel}</button>
+                    <button className={styles.btnPrimary} onClick={onConfirm}>{confirmLabel}</button>
                 </div>
             </div>
         </div>

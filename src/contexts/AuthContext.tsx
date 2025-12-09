@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {jwtDecode} from "jwt-decode";
 
  interface AuthResponse {
     accessToken: string;
@@ -19,7 +20,8 @@ interface UserData {
     username: string; 
     accessToken: string; 
     refreshToken: string;
-    refreshTokenExpiryTime: string; 
+    refreshTokenExpiryTime: string;
+    role: string;
 }
 
 interface AuthContextType {
@@ -124,13 +126,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
 
             const apiResponse: AuthResponse = await response.json(); 
-
+            const decoded: any = jwtDecode(apiResponse.accessToken);
+            //console.log(decoded);
+            const role = decoded.role 
+                || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]; 
             const userData: UserData = {
                 appUserId: apiResponse.appUserId,
                 username: usercode,
                 accessToken: apiResponse.accessToken,
                 refreshToken: apiResponse.refreshToken,
-                refreshTokenExpiryTime: apiResponse.refreshTokenExpiryTime, 
+                refreshTokenExpiryTime: apiResponse.refreshTokenExpiryTime,
+                role: role
             };
             saveUserData(userData);
             return userData;
