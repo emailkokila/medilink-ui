@@ -34,3 +34,4 @@ jobs:
       run: npm run build
       env:
           REACT_APP_API_URL: https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net
+          CI: false 
