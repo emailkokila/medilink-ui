@@ -1,6 +1,5 @@
 import styles from "./Home.module.css";
 import backgroundImage from "../../assets/images/background-image.jpg";
-import { useNavigate } from "react-router-dom";
 export default function HomePage() {
     return <div
       className={styles.container}
