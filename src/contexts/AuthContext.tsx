@@ -110,9 +110,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (usercode: string, password: string): Promise<UserData> => {
-        const LOGIN_URL = 'https://localhost:7179/api/v1/Auth/login';
+        //const LOGIN_URL = 'https://localhost:7179/api/v1/Auth/login';
+        const BASE_API_URL = 'https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net';
+        const LOGIN_PATH = '/api/v1/Auth/login';
+        const completeLoginUrl = `${BASE_API_URL}${LOGIN_PATH}`;
         try {
-            const response = await fetch(LOGIN_URL, {
+            const response = await fetch(completeLoginUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

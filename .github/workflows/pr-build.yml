@@ -1,0 +1,37 @@
+name: PR Build React App
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x' # Use your project's required Node version
+        
+    # Cache Node modules (optional but speeds up builds)
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build React App (Verification Only)
+      # This step verifies the app builds successfully without deploying
+        run: npm run build
+        env:
+          REACT_APP_API_URL: https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net
+          CI: false

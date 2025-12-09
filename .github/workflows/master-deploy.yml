@@ -1,0 +1,32 @@
+name: Master Merge & Deploy to Azure
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # The SWA deploy action handles the build process internally using Oryx
+    # with the nodejs_version you specify.
+    - name: Build and Deploy to Azure Static Web App
+      uses: azure/static-web-apps-deploy@v1
+      with:
+        action: "upload"
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_REACT_DEPLOY_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        # Configuration for the SWA Builder (Oryx)
+        app_location: "/" 
+        output_location: "build" 
+        api_location: ""         
+        # We don't skip the build, we custom configure it above
+        skip_api_build: true
+        
+        # Add this line to skip strict CI/TypeScript errors during build:
+        app_build_command: "CI=false npm run build" 
