@@ -18,7 +18,7 @@ jobs:
         node-version: '20.x' # Use your project's required Node version
 
     - name: Install dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps
 
     - name: Build React App (Verification Only)
       # This step verifies the app builds successfully without deploying
