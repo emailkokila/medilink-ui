@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useApi } from "../../services/useApi";
 import styles from "./PastAppointments.module.css";
 import { formatDateTime, formatDateTimeFromIso, formatStatus } from '../../utils/formatters';
-import { faArrowLeft, faRectangleTimes } from '@fortawesome/free-solid-svg-icons'; 
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 interface Appointment {
     appointmentId: number;

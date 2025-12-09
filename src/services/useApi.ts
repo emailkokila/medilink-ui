@@ -1,17 +1,4 @@
 import { useAuth } from '../contexts/AuthContext';
-
-interface User {
-  username: string;
-  accessToken: string;
-  appUserId: number;
-}
-
-interface LoginPayload {
-  username: string;
-  accessToken: string;
-  appUserId?: number;
-}
-
 // making actual requests to my backend services
 //Manages authenticated fetching/interception
 // this depends on useAuth to get the token, refreshtoken

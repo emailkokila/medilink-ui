@@ -45,7 +45,7 @@ interface ErrorDialogProps {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ date: string; time: string } | null>(null);
   const [startIndex, setStartIndex] = useState(0);
-  const [_lastLoadedDate, setLastLoadedDate] = useState<string>(new Date().toISOString());
+  //const [_lastLoadedDate, setLastLoadedDate] = useState<string>(new Date().toISOString());
   const visibleDaysCount = 5;
   const [newDates, setNewDates] = useState<string[]>([]);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -116,7 +116,7 @@ interface ErrorDialogProps {
   const handleRefresh = () => {
   setStartIndex(0); // reset to first page
   setAvailableSlots(null); // clear existing slots
-  setLastLoadedDate(new Date().toISOString()); // reset last loaded date
+  //setLastLoadedDate(new Date().toISOString()); // reset last loaded date
   loadSlots(); // load today's slots
 };
   const formatDateForApi = (date: Date) => {
@@ -166,9 +166,9 @@ interface ErrorDialogProps {
         setAvailableSlots(data);
       }
       // Update lastLoadedDate to last date returned
-      if (data.days.length > 0) {
+      /*if (data.days.length > 0) {
         setLastLoadedDate(data.days[data.days.length - 1].date);
-      }
+      }*/
     } catch (err: any) {
       setError(err.message);
     } finally {
