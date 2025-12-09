@@ -1,4 +1,4 @@
-import React, { useEffect, useState  } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useApi } from '../../services/useApi';
 import styles from './DisplayTimeScreen.module.css';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -45,7 +45,7 @@ interface ErrorDialogProps {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ date: string; time: string } | null>(null);
   const [startIndex, setStartIndex] = useState(0);
-  const [lastLoadedDate, setLastLoadedDate] = useState<string>(new Date().toISOString());
+  const [_lastLoadedDate, setLastLoadedDate] = useState<string>(new Date().toISOString());
   const visibleDaysCount = 5;
   const [newDates, setNewDates] = useState<string[]>([]);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -129,7 +129,7 @@ interface ErrorDialogProps {
   new Date(availableSlot.days[Math.min(startIndex + visibleDaysCount - 1, availableSlot.days.length - 1)].date) >= maxDate;
   
   const appointmentId = location.state?.currentAppointmentId;
-  const loadSlots = async (date?: string) => {
+  const loadSlots = useCallback(async (date?: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -138,7 +138,7 @@ interface ErrorDialogProps {
         `api/v1/appointment/available-slots?Date=${queryDate}`,
          { method: "GET" }
       );
-      const contentType = response.headers.get("content-type") || "";
+      //const contentType = response.headers.get("content-type") || "";
       const responseText = await response.text();
       if (!response.ok) {
          let errorText = "";
@@ -174,11 +174,11 @@ interface ErrorDialogProps {
     } finally {
       setLoading(false);
     }
-  };
+  },[authenticatedFetch, availableSlot]);
 
   useEffect(() => {
     loadSlots();
-  }, []);
+  }, [loadSlots]);
 
   // Clear new day highlights after animation
 useEffect(() => {
@@ -223,10 +223,10 @@ useEffect(() => {
     setErrorDialogOpen(true);    
   };
 
-  const closeErrorDialog = () => {
+  /*const closeErrorDialog = () => {
     setErrorDialogOpen(false);
     setErrorMessage("");
-  };
+  };*/
   const reScheduleAppointment = async() =>{
       try{
           const response = await authenticatedFetch(`api/v2/appointment/rebook-appointment`, 

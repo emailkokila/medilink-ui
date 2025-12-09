@@ -21,7 +21,7 @@
 
   export const formatDateTimeFromIso = (isoString: string): string => {
     // The Date object handles parsing the full ISO string automatically
-    if (isoString == "")
+    if (isoString === "")
     {
         return "No appointments";
     }

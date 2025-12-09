@@ -12,11 +12,6 @@ interface LoginPayload {
   appUserId?: number;
 }
 
-interface AuthContextType {
-  user: User | null;
-  login: (payload: LoginPayload) => void;
-  logout: () => void;
-}
 // making actual requests to my backend services
 //Manages authenticated fetching/interception
 // this depends on useAuth to get the token, refreshtoken

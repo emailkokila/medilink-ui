@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Footer from "./components/layout/Footer";
+//import Footer from "./components/layout/Footer";
 import Layout from "./components/layout/Layout";
 import LoginSplash from "./pages/login-splash/LoginSplash";
 import UserDashboard from "./pages/user-dashboard/UserDashboard";

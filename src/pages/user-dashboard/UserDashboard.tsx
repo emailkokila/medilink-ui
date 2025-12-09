@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useApi } from "../../services/useApi";
 import styles from "./UserDashboard.module.css";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import bannerImg from "../../assets/images/banner3.jpg";
-import { MdAccessTimeFilled, MdHistory, MdClose } from "react-icons/md";
+import { MdAccessTimeFilled, MdHistory } from "react-icons/md";
 import { HiXMark  } from "react-icons/hi2";
 import { formatDateTimeFromIso } from "../../utils/formatters";
 const UserDashboard = () => {
@@ -24,7 +24,7 @@ const UserDashboard = () => {
     cancelledAppointmentCount: number;
   } | null>(null);
   const { authenticatedFetch } = useApi(); // Get the fetch utility
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
       try {
             const response = await authenticatedFetch('api/v1/appointment/summary', {
               method: 'GET',
@@ -36,11 +36,11 @@ const UserDashboard = () => {
             console.error("Failed to fetch dashboard data:", (error as Error).message);
             // The authenticatedFetch handles 401 logout automatically
         }
-  };
+  },[authenticatedFetch]);
 
   useEffect(() => {
         fetchDashboardData();
-  }, []);
+  }, [fetchDashboardData]);
 
   return (
     <div className={styles.layout}>

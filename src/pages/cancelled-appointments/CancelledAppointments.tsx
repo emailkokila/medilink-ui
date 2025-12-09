@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback  } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../services/useApi";
@@ -41,7 +41,7 @@ const CancelledAppointments = ()=> {
             setCurrentPage(currentPage - 1);
         }
     };
-    const fetchAppointments = async (page = currentPage, size = pageSize) => {
+    const fetchAppointments = useCallback(async (page:number, size:number) => {
         setIsLoading(true);
         try{
              const response = await authenticatedFetch(`api/v1/appointment/by-patient?PageNumber=${page}&PageSize=${size}&Status=2`, {
@@ -67,11 +67,11 @@ const CancelledAppointments = ()=> {
         finally {
             setIsLoading(false); // Set loading to false when done
         }
-    }
+    },[authenticatedFetch]);
     // Fetch whenever page or pageSize changes
     useEffect(()=>{
         fetchAppointments(currentPage, pageSize);
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, fetchAppointments]);
 
     // pagination calculation    
     const totalPages = Math.ceil(totalCount / pageSize);
