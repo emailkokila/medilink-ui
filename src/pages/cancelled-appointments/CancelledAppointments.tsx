@@ -70,7 +70,7 @@ const CancelledAppointments = ()=> {
             setIsLoading(false); // Set loading to false when done
             setIsFirstLoad(false);
         }
-    },[authenticatedFetch, currentPage, pageSize]);
+    },[authenticatedFetch, currentPage, pageSize, isFirstLoad]);
     // Fetch whenever page or pageSize changes
     useEffect(()=>{
         fetchAppointments();

@@ -28,7 +28,7 @@ const PastAppointments = ()=> {
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);    
-    const [isFirstLoad, setIsFirstLoad] = useState(true);
+    ///const [isFirstLoad, setIsFirstLoad] = useState(true);
     // Function to handle moving to the next page
     const handleNextPage = () => {
         if (currentPage < totalPages) {

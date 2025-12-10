@@ -26,7 +26,8 @@ const ClinicianAppointments = () => {
   const [isLoading, setIsLoading] = useState(true); 
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  //const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
 
   const [isCancellationModalOpen, setIsCancellationModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
