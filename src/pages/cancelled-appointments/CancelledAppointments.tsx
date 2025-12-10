@@ -27,7 +27,8 @@ const CancelledAppointments = ()=> {
     const [isLoading, setIsLoading] = useState(true); 
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(10);    
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
     // Function to handle moving to the next page
     const handleNextPage = () => {
         if (currentPage < totalPages) {
@@ -41,10 +42,11 @@ const CancelledAppointments = ()=> {
             setCurrentPage(currentPage - 1);
         }
     };
-    const fetchAppointments = useCallback(async (page:number, size:number) => {
+    const fetchAppointments = useCallback(async () => {
+      if (isFirstLoad)
         setIsLoading(true);
         try{
-             const response = await authenticatedFetch(`api/v1/appointment/by-patient?PageNumber=${page}&PageSize=${size}&Status=2`, {
+             const response = await authenticatedFetch(`api/v1/appointment/by-patient?PageNumber=${currentPage}&PageSize=${pageSize}&Status=2`, {
               method: 'GET',
           });
          if (!response.ok) {
@@ -66,17 +68,18 @@ const CancelledAppointments = ()=> {
         }
         finally {
             setIsLoading(false); // Set loading to false when done
+            setIsFirstLoad(false);
         }
-    },[authenticatedFetch]);
+    },[authenticatedFetch, currentPage, pageSize]);
     // Fetch whenever page or pageSize changes
     useEffect(()=>{
-        fetchAppointments(currentPage, pageSize);
-    }, [currentPage, pageSize, fetchAppointments]);
+        fetchAppointments();
+    }, [fetchAppointments]);
 
     // pagination calculation    
     const totalPages = Math.ceil(totalCount / pageSize);
-    if (isLoading) {
-        return <div className={styles.layout}>Loading appointments...</div>;
+    if (isLoading && totalCount === 0) {
+      return <div className={styles.layout}>Loading appointments...</div>;
     }
     return (
      <div className={styles.layout}>
@@ -116,6 +119,11 @@ const CancelledAppointments = ()=> {
         <div className={styles.tableContainer} style={{ marginTop: "20px" }}>
             {/* Entries selector */}
           <div style={{ marginBottom: "10px", display: "flex", justifyContent: "space-between" }}>
+            {isLoading && (
+              <div className={styles.smallLoaderOverlay }>
+                Loading...
+              </div>
+            )}
             <div className={styles.paginationText}>
               Show{" "}
               <select

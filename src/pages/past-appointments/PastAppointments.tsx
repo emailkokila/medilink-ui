@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback} from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../services/useApi";
@@ -27,7 +27,8 @@ const PastAppointments = ()=> {
     const [isLoading, setIsLoading] = useState(true); 
     const [totalCount, setTotalCount] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(10);    
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
     // Function to handle moving to the next page
     const handleNextPage = () => {
         if (currentPage < totalPages) {
@@ -41,43 +42,42 @@ const PastAppointments = ()=> {
             setCurrentPage(currentPage - 1);
         }
     };
-    const fetchAppointments = useCallback(async (page: number, size : number) => {
+     // Fetch appointments
+    const loadAppointments = useCallback(async (page: number, size: number) => {
         setIsLoading(true);
-        try{
-             const response = await authenticatedFetch(`api/v1/appointment/by-patient?PageNumber=${page}&PageSize=${size}&Status=3`, {
-              method: 'GET',
-          });
-         if (!response.ok) {
-               const errorData = await response.text();
-               throw new Error(`API error: ${response.status} - ${errorData}`);
-          }
-          
-          const result: Appointment[] = await response.json();
-          const total = response.headers.get("x-total-count");
-          const totalCountFromHeader = total ? parseInt(total) : result.length;
-          setAppointments(result);
-          setTotalCount(totalCountFromHeader);
+        try {
+            const response = await authenticatedFetch(
+                `api/v1/appointment/by-patient?PageNumber=${page}&PageSize=${size}&Status=3`
+            );
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                throw new Error(`API error: ${response.status} - ${errorData}`);
+            }
+
+            const data: Appointment[] = await response.json();
+            const total = response.headers.get("x-total-count");
+
+            setAppointments(data);
+            setTotalCount(total ? parseInt(total) : data.length);
+        } catch (error) {
+            console.error("Failed to fetch appointments:", (error as Error).message);
+            setAppointments([]);
+            setTotalCount(0);
+            setIsLoading(false);
+        } finally {
+            setIsLoading(false);
         }
-        catch(error){
-             console.error("Failed to fetch appointments:", (error as Error).message);
-             setAppointments([]);
-             setTotalCount(0);
-             setIsLoading(false);
-        }
-        finally {
-            setIsLoading(false); // Set loading to false when done
-        }
-    },[authenticatedFetch]);
-    // Fetch whenever page or pageSize changes
-    useEffect(()=>{
-        fetchAppointments(currentPage, pageSize);
-    }, [currentPage, pageSize,fetchAppointments]);
+    }, [authenticatedFetch]);
+
+    // Fetch on page or pageSize change
+    useEffect(() => {
+        loadAppointments(currentPage, pageSize);
+    }, [currentPage, pageSize, loadAppointments]);
+
 
     // pagination calculation    
     const totalPages = Math.ceil(totalCount / pageSize);
-    if (isLoading) {
-        return <div className={styles.layout}>Loading appointments...</div>;
-    }
     return (
      <div className={styles.layout}>
       {/* SIDEBAR */}
@@ -114,7 +114,11 @@ const PastAppointments = ()=> {
         </div>
          {/* TABLE */}
         <div className={styles.tableContainer} style={{ marginTop: "20px" }}>
-            {/* Entries selector */}
+           {/* Small inline loading indicator – avoids flicker */}
+          {isLoading && appointments.length === 0 &&(
+            <div className={styles.smallLoader}>Loading...</div>
+          )}
+          {/* Entries selector */}
           <div style={{ marginBottom: "10px", display: "flex", justifyContent: "space-between" }}>
             <div className={styles.paginationText}>
               Show{" "}

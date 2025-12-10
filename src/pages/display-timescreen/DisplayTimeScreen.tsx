@@ -34,6 +34,34 @@ interface ErrorDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
+const SuccessDialog: React.FC<SuccessDialogProps> = ({ message, isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+      <div className={styles.overlay} style={{ zIndex: 9999 }}>
+        <div className={styles.dialogBox}>
+          <div className={styles.iconPlaceholder}>✅</div>
+          <p className={styles.message}>{message}</p>
+          <button onClick={onClose} className={styles.closeButton}>
+            OK
+          </button>
+        </div>
+      </div>
+    );
+  };
+  const ErrorDialog: React.FC<ErrorDialogProps> = ({ message, isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+        <div className={styles.overlay}>
+          <div className={styles.dialogBox}>
+            <div className={styles.iconPlaceholder}>❌</div>
+            <p className={styles.message}>{message}</p>
+            <button onClick={onClose} className={styles.closeButton}>
+              OK
+            </button>
+          </div>
+        </div>
+      );
+  };
   const DisplayTimeScreen = () => {
   const { authenticatedFetch } = useApi();
   const { logout, user } = useAuth();
@@ -174,7 +202,7 @@ interface ErrorDialogProps {
     } finally {
       setLoading(false);
     }
-  },[authenticatedFetch, availableSlot]);
+  },[authenticatedFetch]);
 
   useEffect(() => {
     loadSlots();
@@ -190,34 +218,7 @@ useEffect(() => {
   if (loading && !availableSlot) return <div>Loading slots...</div>;
   if (error) return <div>Error: {error}</div>;
   
-  const SuccessDialog: React.FC<SuccessDialogProps> = ({ message, isOpen, onClose }) => {
-    if (!isOpen) return null;
-    return (
-      <div className={styles.overlay}>
-        <div className={styles.dialogBox}>
-          <div className={styles.iconPlaceholder}>✅</div>
-          <p className={styles.message}>{message}</p>
-          <button onClick={onClose} className={styles.closeButton}>
-            OK
-          </button>
-        </div>
-      </div>
-    );
-  };
-  const ErrorDialog: React.FC<ErrorDialogProps> = ({ message, isOpen, onClose }) => {
-    if (!isOpen) return null;
-    return (
-        <div className={styles.overlay}>
-          <div className={styles.dialogBox}>
-            <div className={styles.iconPlaceholder}>❌</div>
-            <p className={styles.message}>{message}</p>
-            <button onClick={onClose} className={styles.closeButton}>
-              OK
-            </button>
-          </div>
-        </div>
-      );
-  };
+  
   const showErrorDialog = (message: string) => {
     setErrorMessage(message);
     setErrorDialogOpen(true);    
@@ -246,7 +247,8 @@ useEffect(() => {
         if (response.ok) {
             // Handle successful scenario (HTTP 200 OK implied)
             setSuccessMessage("Appointment successfully updated.");
-            setIsSuccessOpen(true);            
+            setIsSuccessOpen(true);
+            setSelectedSlot(null);
         } else {
             // Handle error scenarios where status is outside 200-299
             const statusCode = response.status;
@@ -328,7 +330,7 @@ useEffect(() => {
   const Schedule = async () => {
       console.log("ScheduleAppointment called", selectedSlot);
       console.log("Schedule branch chosen:", appointmentId != null && appointmentId > 0 ? "reschedule" : "new schedule");
-    if (appointmentId != null &&appointmentId > 0)
+    if (appointmentId != null && appointmentId > 0)
     {
       await reScheduleAppointment();
     }
@@ -342,7 +344,11 @@ useEffect(() => {
     setSelectedSlot(null);
     navigate(-1);
   }
-
+  const handleSuccessModalClose = () => {
+    setIsSuccessOpen(false); // Close the modal
+    setSuccessMessage(""); 
+    navigate('/user-appointments'); // Navigate away after the user clicks OK
+  };
   return (
   <div className={styles.layout}>
     {/* SIDEBAR */}
@@ -466,15 +472,15 @@ useEffect(() => {
             
           </div>
         )}
-        <SuccessDialog 
+        
+      </div>
+    </div>
+    <SuccessDialog 
                 message={successMessage} 
                 isOpen={isSuccessOpen} 
-                onClose={() => {
-                  setIsSuccessOpen(false);
-                  navigate('/user-appointments');
-                }} 
+                onClose={handleSuccessModalClose} 
          />
-         <ErrorDialog
+    <ErrorDialog
             message={errorMessage}
             isOpen={errorDialogOpen}
             onClose={() => {
@@ -482,9 +488,7 @@ useEffect(() => {
               setErrorMessage('');
               navigate('/user-appointments');
             }}
-          />
-      </div>
-    </div>
+    />
   </div>
 );
 };

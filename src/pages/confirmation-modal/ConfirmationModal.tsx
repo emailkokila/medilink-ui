@@ -7,6 +7,7 @@ interface ModalProps {
     message?: string;
     confirmLabel?: string;
     cancelLabel?: string;
+    isLoading?: boolean;
 }
 
 export const ConfirmationModal: React.FC<ModalProps> = ({
@@ -15,7 +16,8 @@ export const ConfirmationModal: React.FC<ModalProps> = ({
     title = "Are you sure?",
     message = "Do you really want to cancel this appointment?",
     confirmLabel = "Yes, Cancel",
-    cancelLabel = "No"
+    cancelLabel = "No",
+    isLoading = false
 }) => {
     return (
         <div className={styles.modalOverlay}>
