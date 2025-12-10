@@ -110,7 +110,9 @@ const UserAppointments = ()=> {
     };
 
     const fetchAppointments = useCallback(async (page :number, size :number) => {
-        setIsLoading(true);
+        if (appointments.length === 0) {
+            setIsLoading(true);
+        }
         try{
              const response = await authenticatedFetch(`api/v1/appointment/by-patient?PageNumber=${page}&PageSize=${size}&Status=1`, {
               method: 'GET',
@@ -135,7 +137,7 @@ const UserAppointments = ()=> {
         finally {
             setIsLoading(false); // Set loading to false when done
         }
-    },[authenticatedFetch]);
+    },[authenticatedFetch, appointments.length]);
     // Fetch whenever page or pageSize changes
     useEffect(()=>{
         fetchAppointments(currentPage, pageSize);
