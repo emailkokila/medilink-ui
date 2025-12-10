@@ -202,7 +202,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ message, isOpen, onClose 
     } finally {
       setLoading(false);
     }
-  },[authenticatedFetch]);
+  },[authenticatedFetch, availableSlot]);
 
   useEffect(() => {
     loadSlots();
