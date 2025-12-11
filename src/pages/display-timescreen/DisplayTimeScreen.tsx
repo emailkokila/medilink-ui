@@ -209,11 +209,32 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ message, isOpen, onClose 
   }, [loadSlots]);
 
   // Clear new day highlights after animation
-useEffect(() => {
-  if (newDates.length === 0) return;
-  const timer = setTimeout(() => setNewDates([]), 300); // match animation duration
-  return () => clearTimeout(timer);
-}, [newDates]);
+  useEffect(() => {
+    if (newDates.length === 0) return;
+    const timer = setTimeout(() => setNewDates([]), 300); // match animation duration
+    return () => clearTimeout(timer);
+  }, [newDates]);
+
+  const hasUserRole = user?.role?.includes("User");
+  const hasAdminRole = user?.role?.includes("Admin");
+  var navigateTo = "/login";
+    if (hasUserRole) 
+    {
+      navigateTo = "/user-dashboard";
+    }
+    else if (hasAdminRole)
+    {
+      navigateTo = "/clinician-appointments";
+    }
+    if (!hasUserRole) {
+      return (
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <h2>Access Denied</h2>
+          <p>You do not have permission to view this page.</p>
+          <button className={styles.btnGoHome} onClick={() => navigate(navigateTo)}>Go Home</button>
+        </div>
+      );
+  }
 
   if (loading && !availableSlot) return <div>Loading slots...</div>;
   if (error) return <div>Error: {error}</div>;
