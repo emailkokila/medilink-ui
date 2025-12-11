@@ -57,14 +57,13 @@ const ClinicianAppointments = () => {
         setIsActionLoading(true);
 
      try {
-      closeCancellationModal();
       await cancelAppointment(selectedAppointmentId, selectedPatientId);
       await fetchAppointments(currentPage, pageSize); // refresh list
     } catch (error) {
       console.error(error);
     } finally {
       setIsActionLoading(false);
-      //closeCancellationModal();
+      closeCancellationModal();
       setSelectedAppointmentId(null);
       setSelectedPatientId(null);
     }
@@ -80,15 +79,14 @@ const ClinicianAppointments = () => {
   const confirmCompletion = async () => {
     if (selectedAppointmentId !== null && selectedPatientId != null) {
         setIsActionLoading(true);
-        try {        
-        closeCompletionModal();
+        try {
         await completeAppointment(selectedAppointmentId, selectedPatientId);
         await fetchAppointments(currentPage, pageSize);
         } catch (error) {
         console.error(error);
         } finally {
         setIsActionLoading(false);
-        //closeCompletionModal();
+        closeCompletionModal();
         setSelectedAppointmentId(null);
         setSelectedPatientId(null);
         }
