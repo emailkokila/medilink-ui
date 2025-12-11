@@ -153,6 +153,27 @@ const ClinicianAppointments = () => {
     fetchAppointments(currentPage, pageSize);
   }, [currentPage, pageSize, fetchAppointments]);
 
+  const hasUserRole = user?.role?.includes("User");
+  const hasAdminRole = user?.role?.includes("Admin");
+  var navigateTo = "/login";
+    if (hasUserRole) 
+    {
+      navigateTo = "/user-dashboard";
+    }
+    else if (hasAdminRole)
+    {
+      navigateTo = "/clinician-appointments";
+    }
+    if (!hasAdminRole) {
+      return (
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <h2>Access Denied</h2>
+          <p>You do not have permission to view this page.</p>
+          <button className={styles.btnGoHome} onClick={() => navigate(navigateTo)}>Go Home</button>
+        </div>
+      );
+  }
+
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const handleNextPage = () => { if (currentPage < totalPages) setCurrentPage(currentPage + 1); };

@@ -284,3 +284,26 @@
 .logo:hover {
   transform: scale(1.05); /* small hover effect */
 }
+.btnGoHome {
+  padding: 10px 25px;           /* Space inside the button */
+  background-color: #4f46e5;    /* Indigo 600 */
+  color: #ffffff;               /* White text */
+  font-weight: 600;             /* Slightly bold */
+  font-size: 16px;              /* Readable size */
+  border: none;                 /* Remove default border */
+  border-radius: 8px;           /* Rounded corners */
+  cursor: pointer;              /* Pointer on hover */
+  transition: all 0.3s ease;   /* Smooth hover transition */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+.btnGoHome:hover {
+  background-color: #4338ca;    /* Darker Indigo on hover */
+  transform: translateY(-2px);  /* Slight lift effect */
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15); /* Slightly bigger shadow */
+}
+
+.btnGoHome:active {
+  transform: translateY(0);     /* Reset lift on click */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);  /* Reset shadow */
+}

@@ -1,4 +1,5 @@
 import { useAuth } from '../contexts/AuthContext';
+import { useCallback, useMemo } from 'react';
 // making actual requests to my backend services
 //Manages authenticated fetching/interception
 // this depends on useAuth to get the token, refreshtoken
@@ -8,7 +9,7 @@ export const useApi = () => {
     const BASE_API_URL = 'https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net';
     //const BASE_API_URL = 'https://localhost:7179';
 
-    const authenticatedFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const authenticatedFetch = useCallback(async (url: string, options: RequestInit = {}): Promise<Response> => {
         let finalUrl = url;
         // Check if the provided URL is a relative path (doesn't start with http/https)
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -68,7 +69,10 @@ export const useApi = () => {
         }
 
         return response;
-    };
+    }, [token, logout, refreshToken]);
 
-    return { authenticatedFetch };
+    // memoize the returned object so React sees it as stable
+    const api = useMemo(() => ({ authenticatedFetch }), [authenticatedFetch]);
+
+    return api;
 };

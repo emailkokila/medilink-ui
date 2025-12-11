@@ -41,7 +41,27 @@ const UserDashboard = () => {
   useEffect(() => {
         fetchDashboardData();
   }, [fetchDashboardData]);
-
+  
+  const hasUserRole = user?.role?.includes("User");
+  const hasAdminRole = user?.role?.includes("Admin");
+  var navigateTo = "/login";
+    if (hasUserRole) 
+    {
+      navigateTo = "/user-dashboard";
+    }
+    else if (hasAdminRole)
+    {
+      navigateTo = "/clinician-appointments";
+    }
+    if (!hasUserRole) {
+      return (
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <h2>Access Denied</h2>
+          <p>You do not have permission to view this page.</p>
+          <button className={styles.btnGoHome} onClick={() => navigate(navigateTo)}>Go Home</button>
+        </div>
+      );
+  }
   return (
     <div className={styles.layout}>
       {/* LEFT SIDEBAR */}

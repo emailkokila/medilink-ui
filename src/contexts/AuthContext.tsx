@@ -53,7 +53,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     // function to call the Refresh Token API
     const refreshToken = async (): Promise<string | null> => {
-        const REFRESH_URL = 'https://localhost:7179/api/v1/Auth/Refresh'; // Replace with your actual URL
+        //const BASE_API_URL = 'https://localhost:7179';
+        const BASE_API_URL = 'https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net';
+        const REFRESH_URL = '/api/v1/Auth/Refresh'; // Replace with your actual URL
+        const completeRefreshUrl = `${BASE_API_URL}${REFRESH_URL}`;
         const currentUser = JSON.parse(sessionStorage.getItem('user') || 'null');
 
         if (!currentUser || !currentUser.refreshToken || !currentUser.appUserId) {
@@ -63,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         try {
-            const response = await fetch(REFRESH_URL, {
+            const response = await fetch(completeRefreshUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (usercode: string, password: string): Promise<UserData> => {
-        //const BASE_API_URL = 'https://localhost:7179';
+       // const BASE_API_URL = 'https://localhost:7179';
         const BASE_API_URL = 'https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net';
         const LOGIN_PATH = '/api/v1/Auth/login';
         const completeLoginUrl = `${BASE_API_URL}${LOGIN_PATH}`;
