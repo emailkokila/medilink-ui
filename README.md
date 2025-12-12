@@ -1,51 +1,167 @@
-# medilink-ui
-Front-end React application for MediLink, a medical appointment management system.
-# Getting Started with Create React App
+MediLink.UI (React Application)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A responsive frontend application built with React, providing interfaces for both patients and clinicians to interact with the MediLink API.
+The app supports appointment booking, management, authentication, and clinician workflows.
 
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-# medilink-ui
-Front-end React application for MediLink, a medical appointment management system.
+## Table of Contents
+Overview
+Architecture
+Features
+Tech Stack
+API Communication
+Environment Variables
+Running Locally
+Project Structure
+Authentication Flow
+Production Deployment
+CI/CD Pipeline
+License
+## Overview
+MediLink.UI is a React-based frontend designed to work with MediLink.API.
+It offers separate workflows for:
+Patients – schedule, reschedule, cancel appointments
+Clinicians – view, complete, and manage appointments
+Shared – secure authentication, profile data, etc.
+The app uses role-based access control, ensuring that patients and clinicians only access the pages intended for them.
+## Architecture
+The frontend uses a modular and maintainable structure:
+Pages – route-level UI
+Components – reusable visual elements
+Services – communication with MediLink.API
+Context / Hooks – auth state & session handling
+Routing – protected routes based on JWT role claims
+Architecture Diagram
++-------------------------------+
+|        Users / Clinicians     |
+|   (Browser - React Frontend)  |
++-------------------------------+
+               |
+               ▼
++-------------------------------+
+|          React App            |
+|  (Pages, Components, Routes)  |
++---------------+---------------+
+                |
+    Uses        | Fetch API Calls
+                ▼
++-------------------------------+
+|         API Services          |
+|   src/services/*.js           |
+|  (Fetch wrappers, auth, DTOs) |
++---------------+---------------+
+                |
+  Sends requests| with JWT tokens
+                ▼
++-------------------------------+
+|       MediLink.API Backend    |
+|  (v1 & v2 appointment APIs)   |
++---------------+---------------+
+                |
+       Returns JSON responses
+                ▼
++-------------------------------+
+| State / Context / Hooks       |
+| (AuthContext, UserContext)    |
++---------------+---------------+
+                |
+    Updates UI based on state
+                ▼
++-------------------------------+
+|       React UI Components     |
+| (Forms, Cards, Layout, Alerts)|
++-------------------------------+
+## Features
+Patient Features
+Login
+Book, reschedule, or cancel appointments
+View upcoming / past appointments
+Receive backend email notifications (via Worker Service)
+Clinician Features
+Login (Clinician role)
+View assigned patients
+Complete or cancel appointments
+Access clinician-only UI pages
+Shared Features
+JWT authentication
+Role-based routing
+API error handling
+Responsive UI (mobile in progress)
+API Communication (Using Fetch API)
+The MediLink UI communicates with the backend using native Fetch, not Axios.
+Fetch wrappers are stored in:
+src/services/
+## TechStack
+The MediLink.UI React application is built using a modern and scalable frontend stack:
+Core Framework
+React 18 – Component-based UI library used to build interactive and dynamic interfaces
+React Router – Client-side routing and protected routes for authenticated pages
+State Management
+React Context API – Global auth session, user state, and role management
+Custom Hooks – Encapsulated logic for authentication, API calls, form state, and business logic
+API Communication
+Fetch API – Native browser API used for communicating with MediLink.API
+Lightweight wrapper modules inside /src/services
+Includes automatic token injection and error handling
+Styling & UI
+CSS Modules / Standard CSS (based on your project structure)
+Responsive design using Flexbox & Grid
+Reusable components for forms, cards, and layouts
+Build & Tooling
+Node.js + npm – Package management and build pipeline
+Vite or CRA (depending on your setup — default is Create React App)
+Development server for hot reload
+Authentication
+JWT-based authentication
+Access token + refresh token handling
+Role-based authorization (patient, clinician)
+Deployment & Hosting
+Azure Static Web Apps / Azure App Service
+GitHub Actions CI/CD pipeline
+Environment-based configuration using .env
+## Environment Variables
+Create a .env file at the project root.
+Local development
+REACT_APP_API_URL=https://localhost:5001
+Production (Azure)
+REACT_APP_API_URL=https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net
+## Running Locally
+Install dependencies:
+npm install
+Start the dev server:
+npm start
+App runs on:
+http://localhost:3000
+Production (Azure Static Web App):
+https://wonderful-flower-0e96d3203.3.azurestaticapps.net/
+## Project Structure
+src/
+ ├── components/      # Shared reusable UI components
+ ├── pages/           # Route pages (Login, Dashboard, etc.)
+ ├── services/        # Fetch API services
+ ├── context/         # Auth context provider
+ ├── hooks/           # Custom hooks
+ ├── utils/           # Helper utilities
+ └── App.js           # Application entry point
+## Production Deployment
+The React application is deployed using:
+Azure App Service
+GitHub Actions CI/CD
+Environment variables configured in Azure
+Build step:
+npm run build
+The /build directory is deployed to Azure.
+## CI/CD Pipeline
+The React UI uses a GitHub Actions CI/CD pipeline to automate build and deployment.
+1. Install Dependencies
+npm install
+2. Build
+npm run build
+3. Deploy
+The /build folder is automatically deployed to Azure App Service.
+## Pipeline Diagram
++-----------+      +-------------+      +-----------+
+|   Push    | ---> |   Build     | ---> |  Deploy   |
+|  to main  |      | (npm run)   |      | to Azure  |
++-----------+      +-------------+      +-----------+
+## License
+This project is licensed under the [MIT License](LICENSE.md) - see the [LICENSE.md](LICENSE.md) file for details.
