@@ -6,8 +6,10 @@ import { useCallback, useMemo } from 'react';
 export const useApi = () => {
     const { user, logout, refreshToken } = useAuth();
     const token = user?.accessToken;
-    const BASE_API_URL = 'https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net';
+    //const BASE_API_URL = 'https://medilink-api-bfahgceqd2eyaxbg.uksouth-01.azurewebsites.net';
     //const BASE_API_URL = 'https://localhost:7179';
+    const BASE_API_URL = 'https://localhost:7234';
+
 
     const authenticatedFetch = useCallback(async (url: string, options: RequestInit = {}): Promise<Response> => {
         let finalUrl = url;
